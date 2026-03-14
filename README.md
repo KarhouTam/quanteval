@@ -79,29 +79,8 @@ results.plot()
 
 Check out these notebooks to level up:
 
-- `examples/01_quickstart.ipynb`: Basic data loading and first backtest 🏃
-- `examples/02_parameter_optimization.ipynb`: Finding the best parameters 🎯
-- `examples/03_strategy_comparison.ipynb`: Battle of the strategies ⚔️
-- `examples/04_hk_market_support.ipynb`: Trading in the Hong Kong market 🇭🇰
-- [TUTORIAL_EN.md](./docs/TUTORIAL_EN.md): Deep dive tutorial 📚
-
-## 🧪 Quality checks
-
-Keep the code clean! Run these before pushing:
-
-```bash
-ruff check .           # ✨ Linting
-pytest                 # ✅ Tests
-python -m build        # 📦 Build wheel
-twine check dist/*     # 🔍 Validate
-```
-
-## 🤖 GitHub Automation
-
-We've set up some helpful bots for:
-
-- ✅ Linting and static checks
-- 🧪 Multi-version Python testing
-- 📓 Notebook smoke tests
-- 📦 Build validation
-- 🏷️ Automatic releases on version tags
+- [`examples/01_quickstart.ipynb`](./examples/01_quickstart.ipynb): Basic data loading and first backtest 🏃
+- [`examples/02_parameter_optimization.ipynb`](./examples/02_parameter_optimization.ipynb): Finding the best parameters 🎯
+- [`examples/03_strategy_comparison.ipynb`](./examples/03_strategy_comparison.ipynb): Battle of the strategies ⚔️
+- [`examples/04_hk_market_support.ipynb`](./examples/04_hk_market_support.ipynb): Trading in the Hong Kong market 🇭🇰
+- [`TUTORIAL_EN.md`](./docs/TUTORIAL_EN.md): Deep dive tutorial 📚

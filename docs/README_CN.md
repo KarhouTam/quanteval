@@ -83,29 +83,8 @@ results.plot()           # 快乐看图
 
 查看这些 Notebooks 快速上手：
 
-- `examples/01_quickstart.ipynb`：新手村第一站，基础数据加载与回测 🏃
-- `examples/02_parameter_optimization.ipynb`：寻找策略“财富密码”，网格搜索与 walk-forward 🎯
-- `examples/03_strategy_comparison.ipynb`：策略大比拼，构建等权组合 ⚔️
-- `examples/04_hk_market_support.ipynb`：进军港股市场，双边印花税与恒指数据 🇭🇰
-- [TUTORIAL_CN.md](./TUTORIAL_CN.md): 深度中文图文教程 📚
-
-## 🧪 追求卓越
-
-代码推上前，记得先在本地跑一遍这些检查：
-
-```bash
-ruff check .           # ✨ 代码风格清理
-pytest                 # ✅ 单元测试
-python -m build        # 📦 构建 wheel 包
-twine check dist/*     # 🔍 校验发布文件
-```
-
-## 🤖 GitHub 自动化
-
-我们已为你配置好了一系列自动化的 GitHub Bots：
-
-- ✅ 代码风格检查与静态分析
-- 🧪 多 Python 版本单元测试
-- 📓 Notebook 执行烟雾测试
-- 📦 构建产物合法性校验
-- 🏷️ 推送版本标签后自动创建 GitHub Release 并发布
+- [`examples/01_quickstart.ipynb`](../examples/01_quickstart.ipynb)：新手村第一站，基础数据加载与回测 🏃
+- [`examples/02_parameter_optimization.ipynb`](../examples/02_parameter_optimization.ipynb)：寻找策略“财富密码”，网格搜索与 walk-forward 🎯
+- [`examples/03_strategy_comparison.ipynb`](../examples/03_strategy_comparison.ipynb)：策略大比拼，构建等权组合 ⚔️
+- [`examples/04_hk_market_support.ipynb`](../examples/04_hk_market_support.ipynb)：进军港股市场，双边印花税与恒指数据 🇭🇰
+- [`TUTORIAL_CN.md`](./TUTORIAL_CN.md): 深度中文图文教程 📚
