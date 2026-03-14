@@ -4,29 +4,17 @@
 
 [中文说明 / Chinese Guide](./docs/README_CN.md) · [贡献指南 / Contributing](./CONTRIBUTING.md)
 
-QuantEval is a lightweight, friendly Python toolkit for researching Chinese A-share strategies, factors, and benchmark comparisons. We've combined a reusable package under `src/quanteval`, tutorial notebooks, and automated workflows to make your quant journey smoother! 🚀
+QuantEval is a lightweight, friendly Python toolkit for researching Chinese A-share and Hong Kong (HKEX) strategies, factors, and benchmark comparisons. We've combined a reusable package under `src/quanteval`, tutorial notebooks, and automated workflows to make your quant journey smoother! 🚀
 
 ## ✨ Highlights
 
 - ⏱️ **Backtesting engine** with delayed signal execution to keep things realistic (no look-ahead bias here!).
-- 🤖 **Built-in strategies**: Dual Moving Average, Bollinger Mean Reversion, and consistent Buy-and-Hold.
+- 🤖 **Built-in strategies**: Dual Moving Average, Mean Reversion, Bollinger Mean Reversion, and consistent Buy-and-Hold.
+- 🔀 **Strategy Comparison**: Multi-strategy correlation analysis, ranking, and equal-weight portfolio construction.
 - 📊 **Technical factors**: From SMA and RSI to MACD, ATR, and more.
 - 🔍 **Optimization**: Grid-search and walk-forward analysis to fine-tune your ideas.
 - 🎨 **Visualization**: Pretty static and interactive plots for your equity curves.
-- 💾 **Data Caching**: Native support for AkShare stock, ETF, and index data.
-
-## 📂 Repository layout
-
-```text
-.
-├── src/quanteval/            # 🧠 Python package core
-├── tests/                    # ✅ Unit tests
-├── examples/                 # 📚 Tutorial notebooks
-├── .github/workflows/        # 🤖 CI / Automation
-├── README.md                 # 🌐 English overview
-├── README_CN.md              # 🏮 Chinese overview
-└── CONTRIBUTING.md           # 🤝 Developer workflow
-```
+- 💾 **Data Caching**: Native support for A-share (AkShare) and Hong Kong market (yfinance) stock, ETF, and index data.
 
 ## 🛠️ Installation
 

@@ -4,29 +4,17 @@
 
 [English README](../README.md) · [贡献指南](../CONTRIBUTING.md)
 
-QuantEval 是一个专门为 A 股研究量身定制的轻量级、友好型 Python 工具包！无论是策略回测、因子验证，还是参数优化，它都能帮你更高效地完成，让你的量化之旅更加顺滑。🚀
+QuantEval 是一个专门为 A 股和港股 (HKEX) 研究量身定制的轻量级、友好型 Python 工具包！无论是策略回测、多策略对比、因子验证，还是参数优化，它都能帮你更高效地完成，让你的量化之旅更加顺滑。🚀
 
 ## ✨ 功能概览
 
 - ⏱️ **专业回测引擎**：支持信号延迟执行，帮你避开恼人的“未来函数”陷阱，让回测更贴近实战！
-- 🤖 **内置经典策略**：双均线 (MA)、布林带 (Bollinger Mean Reversion)、以及稳定的买入持有 (Buy & Hold)。
+- 🤖 **内置经典策略**：双均线 (Dual MA)、均值回归 (Mean Reversion)、布林带回归 (Bollinger Mean Reversion)、以及稳定的买入持有 (Buy & Hold)。
+- 🔀 **多策略对比**：支持多策略相关性分析、指标排名以及等权投资组合 (Equal-weight Portfolio) 的构建。
 - 📊 **丰富技术指标**：从 SMA、EMA 到 RSI、MACD、ATR 以及动量指标等一应俱全。
 - 🔍 **优化与分析**：支持网格搜索优化参数，还有 walk-forward 样本外分析让你的策略更经得起考验。
 - 🎨 **可视化大师**：内置漂亮且直观的静态与交互式图表，轻松查看收益曲线与回撤。
-- 💾 **数据一手掌握**：无缝对接 AkShare 接口，支持股票、ETF、指数数据的本地缓存。
-
-## 📂 仓库结构
-
-```text
-.
-├── src/quanteval/            # 🧠 核心源码包
-├── tests/                    # ✅ 单元测试
-├── examples/                 # 📚 教学示例 Notebook
-├── .github/workflows/        # 🤖 自动化 CI / 发布流程
-├── README.md                 # 🌐 英文主页
-├── README_CN.md              # 🏮 中文说明 (本文件)
-└── CONTRIBUTING.md           # 🤝 开发者指南
-```
+- 💾 **数据一手掌握**：无缝对接 A股 (AkShare) 和 港股 (yfinance) 数据接口，支持股票、ETF、指数数据的本地缓存。
 
 ## 🛠️ 安装方式
 
