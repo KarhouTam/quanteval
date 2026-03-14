@@ -1,36 +1,46 @@
-# QuantEval 中文说明
+# 📈 QuantEval 中文说明
 
 ![CI](https://github.com/KarhouTam/quanteval/actions/workflows/ci.yml/badge.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
 [English README](../README.md) · [贡献指南](../CONTRIBUTING.md)
 
-QuantEval 是一个面向中国 A 股研究场景的轻量级 Python 工具包，适合做策略回测、因子验证、参数优化和策略对比。仓库同时包含可复用的 `src/quanteval` 包、教学示例 Notebook，以及适合发布到 GitHub 的自动化工作流。
+QuantEval 是一个专门为 A 股研究量身定制的轻量级、友好型 Python 工具包！无论是策略回测、因子验证，还是参数优化，它都能帮你更高效地完成，让你的量化之旅更加顺滑。🚀
 
-## 功能概览
+## ✨ 功能概览
 
-- 支持信号延迟执行的回测引擎，降低未来函数风险
-- 内置策略：双均线、布林带均值回归、买入持有
-- 内置技术指标：SMA、EMA、RSI、MACD、ATR、动量、ROC 等
-- 支持策略对比、网格搜索和 walk-forward 样本外分析
-- 提供 matplotlib 与 plotly 两套可视化接口
-- 支持 AkShare 股票、ETF、指数数据获取与本地缓存
+- ⏱️ **专业回测引擎**：支持信号延迟执行，帮你避开恼人的“未来函数”陷阱，让回测更贴近实战！
+- 🤖 **内置经典策略**：双均线 (MA)、布林带 (Bollinger Mean Reversion)、以及稳定的买入持有 (Buy & Hold)。
+- 📊 **丰富技术指标**：从 SMA、EMA 到 RSI、MACD、ATR 以及动量指标等一应俱全。
+- 🔍 **优化与分析**：支持网格搜索优化参数，还有 walk-forward 样本外分析让你的策略更经得起考验。
+- 🎨 **可视化大师**：内置漂亮且直观的静态与交互式图表，轻松查看收益曲线与回撤。
+- 💾 **数据一手掌握**：无缝对接 AkShare 接口，支持股票、ETF、指数数据的本地缓存。
 
-## 仓库结构
+## 📂 仓库结构
 
 ```text
 .
-├── src/quanteval/            # Python 包源码
-├── tests/                    # 单元测试
-├── examples/                 # 教学 Notebook
-├── .github/workflows/        # CI / 发布流程
-├── README.md                 # 英文说明
-├── README_CN.md              # 中文说明
-└── CONTRIBUTING.md           # 贡献与开发流程
+├── src/quanteval/            # 🧠 核心源码包
+├── tests/                    # ✅ 单元测试
+├── examples/                 # 📚 教学示例 Notebook
+├── .github/workflows/        # 🤖 自动化 CI / 发布流程
+├── README.md                 # 🌐 英文主页
+├── README_CN.md              # 🏮 中文说明 (本文件)
+└── CONTRIBUTING.md           # 🤝 开发者指南
 ```
 
-## 安装方式
+## 🛠️ 安装方式
 
-### 普通用户
+### 📦 来自 PyPI
+
+最省心的方式，直接一键安装：
+
+```bash
+pip install quanteval
+```
+
+### 🔨 普通用户（从源码安装）
+
+如果你想运行最新的 master 分支代码：
 
 ```bash
 git clone https://github.com/KarhouTam/quanteval.git
@@ -38,7 +48,9 @@ cd quanteval
 python -m pip install .
 ```
 
-### 开发者
+### 🧑‍💻 开发者安装
+
+如果你打算为项目贡献代码：
 
 ```bash
 git clone https://github.com/KarhouTam/quanteval.git
@@ -46,50 +58,53 @@ cd quanteval
 python -m pip install -e ".[dev]"
 ```
 
-## 快速开始
+## 🚀 快速开始
+
+运行你的第一个 A 股回测只需要几行代码：
 
 ```python
 from quanteval import Backtester, DataLoader, DualMAStrategy
 
+# 1. 搬运点数据 🏪
 loader = DataLoader()
 data = loader.load_stock('600519', '20200101', '20231231')
 
+# 2. 选个策略启动！ 🧠
 strategy = DualMAStrategy(fast_window=10, slow_window=60)
+
+# 3. 看看收益如何？ 📊
 results = Backtester(strategy=strategy, data=data, transaction_costs=True).run()
 
-print(results.summary())
-results.plot()
+print(results.summary()) # 打印关键指标
+results.plot()           # 快乐看图
 ```
 
-## 示例入口
+## 📖 更多干货
 
-- `examples/01_quickstart.ipynb`：首次加载数据并运行回测
-- `examples/02_parameter_optimization.ipynb`：参数搜索与 walk-forward 分析
-- `examples/03_strategy_comparison.ipynb`：多策略对比与等权组合
-- [TUTORIAL_CN.md](./TUTORIAL_CN.md): 中文版教程
+查看这些 Notebooks 快速上手：
 
-## 发布前建议检查
+- `examples/01_quickstart.ipynb`：新手村第一站，基础数据加载与回测 🏃
+- `examples/02_parameter_optimization.ipynb`：寻找策略“财富密码”，网格搜索与 walk-forward 🎯
+- `examples/03_strategy_comparison.ipynb`：策略大比拼，构建等权组合 ⚔️
+- [TUTORIAL_CN.md](./TUTORIAL_CN.md): 深度中文图文教程 📚
+
+## 🧪 追求卓越
+
+代码推上前，记得先在本地跑一遍这些检查：
 
 ```bash
-ruff check .
-pytest
-python -m build
-twine check dist/*
+ruff check .           # ✨ 代码风格清理
+pytest                 # ✅ 单元测试
+python -m build        # 📦 构建 wheel 包
+twine check dist/*     # 🔍 校验发布文件
 ```
 
-## 已添加的 GitHub 自动化
+## 🤖 GitHub 自动化
 
-- 代码风格检查与静态分析
-- 多 Python 版本单元测试
-- Notebook 执行烟雾测试
-- sdist / wheel 构建校验
-- 推送版本标签后自动创建 GitHub Release
+我们已为你配置好了一系列自动化的 GitHub Bots：
 
-## 发布到 GitHub 前请注意
-
-- 发布 tag 前建议重新执行 Notebook，避免输出过期。
-- `data_cache/` 下的大文件默认不纳入版本控制，除非你确实希望附带示例数据。
-
-## 许可证
-
-MIT
+- ✅ 代码风格检查与静态分析
+- 🧪 多 Python 版本单元测试
+- 📓 Notebook 执行烟雾测试
+- 📦 构建产物合法性校验
+- 🏷️ 推送版本标签后自动创建 GitHub Release 并发布

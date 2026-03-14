@@ -1,36 +1,44 @@
-# QuantEval
+# 📈 QuantEval
 
 ![CI](https://github.com/KarhouTam/quanteval/actions/workflows/ci.yml/badge.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
 [中文说明 / Chinese Guide](./docs/README_CN.md) · [贡献指南 / Contributing](./CONTRIBUTING.md)
 
-QuantEval is a lightweight Python toolkit for researching Chinese A-share strategies, factors, and benchmark comparisons. It combines a small reusable package under `src/quanteval`, tutorial notebooks, and GitHub automation so the project is easier to publish, test, and maintain.
+QuantEval is a lightweight, friendly Python toolkit for researching Chinese A-share strategies, factors, and benchmark comparisons. We've combined a reusable package under `src/quanteval`, tutorial notebooks, and automated workflows to make your quant journey smoother! 🚀
 
-## Highlights
+## ✨ Highlights
 
-- Backtesting engine with delayed signal execution to reduce look-ahead bias
-- Built-in strategies: dual moving average, Bollinger mean reversion, buy-and-hold
-- Technical factors including SMA, EMA, RSI, MACD, ATR, momentum, ROC, and more
-- Strategy comparison, grid-search optimization, and walk-forward analysis
-- Static and interactive plots for equity curves and drawdowns
-- Caching support for AkShare stock, ETF, and index data
+- ⏱️ **Backtesting engine** with delayed signal execution to keep things realistic (no look-ahead bias here!).
+- 🤖 **Built-in strategies**: Dual Moving Average, Bollinger Mean Reversion, and consistent Buy-and-Hold.
+- 📊 **Technical factors**: From SMA and RSI to MACD, ATR, and more.
+- 🔍 **Optimization**: Grid-search and walk-forward analysis to fine-tune your ideas.
+- 🎨 **Visualization**: Pretty static and interactive plots for your equity curves.
+- 💾 **Data Caching**: Native support for AkShare stock, ETF, and index data.
 
-## Repository layout
+## 📂 Repository layout
 
 ```text
 .
-├── src/quanteval/            # Python package
-├── tests/                    # Unit tests
-├── examples/                 # Tutorial notebooks
-├── .github/workflows/        # CI / release automation
-├── README.md                 # English overview
-├── README_CN.md              # Chinese overview
-└── CONTRIBUTING.md           # Developer workflow
+├── src/quanteval/            # 🧠 Python package core
+├── tests/                    # ✅ Unit tests
+├── examples/                 # 📚 Tutorial notebooks
+├── .github/workflows/        # 🤖 CI / Automation
+├── README.md                 # 🌐 English overview
+├── README_CN.md              # 🏮 Chinese overview
+└── CONTRIBUTING.md           # 🤝 Developer workflow
 ```
 
-## Installation
+## 🛠️ Installation
 
-### End users
+### 📦 From PyPI
+
+The package is available on PyPI. Install the latest released version with:
+
+```bash
+pip install quanteval
+```
+
+### 🔨 End users (install from source)
 
 ```bash
 git clone https://github.com/KarhouTam/quanteval.git
@@ -38,7 +46,7 @@ cd quanteval
 python -m pip install .
 ```
 
-### Contributors
+### 🧑‍💻 Contributors
 
 ```bash
 git clone https://github.com/KarhouTam/quanteval.git
@@ -46,49 +54,53 @@ cd quanteval
 python -m pip install -e ".[dev]"
 ```
 
-## Quick start
+## 🚀 Quick start
+
+Ready to run your first backtest? It's as simple as this:
 
 ```python
 from quanteval import Backtester, DataLoader, DualMAStrategy
 
+# 1. Grab some data 🏪
 loader = DataLoader()
 data = loader.load_stock('600519', '20200101', '20231231')
 
+# 2. Pick a strategy 🧠
 strategy = DualMAStrategy(fast_window=10, slow_window=60)
+
+# 3. Let's see how it performed! 📊
 results = Backtester(strategy=strategy, data=data, transaction_costs=True).run()
 
 print(results.summary())
 results.plot()
 ```
 
-## More examples
+## 📖 More examples
 
-- `examples/01_quickstart.ipynb`: basic data loading and first backtest
-- `examples/02_parameter_optimization.ipynb`: grid search and walk-forward workflow
-- `examples/03_strategy_comparison.ipynb`: compare strategies and build an equal-weight portfolio
-- [TUTORIAL_EN.md](./docs/TUTORIAL_EN.md): step-by-step written tutorial in English
+Check out these notebooks to level up:
 
-## Quality checks
+- `examples/01_quickstart.ipynb`: Basic data loading and first backtest 🏃
+- `examples/02_parameter_optimization.ipynb`: Finding the best parameters 🎯
+- `examples/03_strategy_comparison.ipynb`: Battle of the strategies ⚔️
+- [TUTORIAL_EN.md](./docs/TUTORIAL_EN.md): Deep dive tutorial 📚
 
-Run the same checks used in CI before publishing:
+## 🧪 Quality checks
+
+Keep the code clean! Run these before pushing:
 
 ```bash
-ruff check .
-pytest
-python -m build
-twine check dist/*
+ruff check .           # ✨ Linting
+pytest                 # ✅ Tests
+python -m build        # 📦 Build wheel
+twine check dist/*     # 🔍 Validate
 ```
 
-## GitHub automation
+## 🤖 GitHub Automation
 
-This repository now includes workflows for:
+We've set up some helpful bots for:
 
-- linting and static checks
-- unit tests across supported Python versions
-- notebook execution smoke tests
-- source distribution / wheel build validation
-- GitHub release creation when a version tag is pushed
-
-## License
-
-MIT
+- ✅ Linting and static checks
+- 🧪 Multi-version Python testing
+- 📓 Notebook smoke tests
+- 📦 Build validation
+- 🏷️ Automatic releases on version tags
