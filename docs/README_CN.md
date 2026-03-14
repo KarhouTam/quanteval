@@ -86,6 +86,7 @@ results.plot()           # 快乐看图
 - `examples/01_quickstart.ipynb`：新手村第一站，基础数据加载与回测 🏃
 - `examples/02_parameter_optimization.ipynb`：寻找策略“财富密码”，网格搜索与 walk-forward 🎯
 - `examples/03_strategy_comparison.ipynb`：策略大比拼，构建等权组合 ⚔️
+- `examples/04_hk_market_support.ipynb`：进军港股市场，双边印花税与恒指数据 🇭🇰
 - [TUTORIAL_CN.md](./TUTORIAL_CN.md): 深度中文图文教程 📚
 
 ## 🧪 追求卓越

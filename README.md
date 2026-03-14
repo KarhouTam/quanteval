@@ -82,6 +82,7 @@ Check out these notebooks to level up:
 - `examples/01_quickstart.ipynb`: Basic data loading and first backtest 🏃
 - `examples/02_parameter_optimization.ipynb`: Finding the best parameters 🎯
 - `examples/03_strategy_comparison.ipynb`: Battle of the strategies ⚔️
+- `examples/04_hk_market_support.ipynb`: Trading in the Hong Kong market 🇭🇰
 - [TUTORIAL_EN.md](./docs/TUTORIAL_EN.md): Deep dive tutorial 📚
 
 ## 🧪 Quality checks

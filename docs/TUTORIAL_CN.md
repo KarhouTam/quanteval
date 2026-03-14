@@ -93,6 +93,7 @@ print(wfa_result.summary())
 2. `examples/01_quickstart.ipynb`：首次跑通回测
 3. `examples/02_parameter_optimization.ipynb`：学习参数搜索与样本外测试
 4. `examples/03_strategy_comparison.ipynb`：学习策略横向比较
+5. `examples/04_hk_market_support.ipynb`：体验港股数据加载与特色交易费率
 
 ## 4. 常见建议
 

@@ -93,6 +93,7 @@ print(wfa_result.summary())
 2. `examples/01_quickstart.ipynb`: First successful backtest execution.
 3. `examples/02_parameter_optimization.ipynb`: Learn parameter search and out-of-sample testing.
 4. `examples/03_strategy_comparison.ipynb`: Learn horizontal strategy comparison.
+5. `examples/04_hk_market_support.ipynb`: Using HK market data and transaction rules.
 
 ## 4. Common Tips
 
