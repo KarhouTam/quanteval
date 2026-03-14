@@ -1,0 +1,27 @@
+# artifacts
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.coverage
+.coverage.*
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+build/
+dist/
+site/
+htmlcov/
+*.egg-info/
+pip-wheel-metadata/
+data_cache/
+.sisyphus/
+.vscode/
+.idea/
+
+# agents
+AGENTS.md
+CLAUDE.md

@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quanteval"
+version = "0.1.0"
+description = "Quantitative strategy and factor evaluation toolkit for the Chinese A-share market"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "Karhou Tam" }
+]
+keywords = ["quant", "finance", "backtesting", "trading", "a-share", "akshare"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Education",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+  "akshare>=1.18.19",
+  "matplotlib>=3.10.0",
+  "numpy>=2.3.0",
+  "pandas>=3.0.0",
+  "plotly>=5.0.0",
+  "pyarrow>=23.0.0",
+  "scipy>=1.11.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.4.0",
+  "ipykernel>=6.29.0",
+  "jupyter>=1.1.0",
+  "nbval>=0.11.0",
+  "pytest>=9.0.0",
+  "ruff>=0.15.0",
+  "twine>=6.2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/KarhouTam/quanteval"
+Documentation = "https://github.com/KarhouTam/quanteval#readme"
+Issues = "https://github.com/KarhouTam/quanteval/issues"
+Source = "https://github.com/KarhouTam/quanteval"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["src/quanteval.egg-info", "examples/*.ipynb", "script.ipynb"]
+
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
