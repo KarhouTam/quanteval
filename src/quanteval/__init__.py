@@ -6,7 +6,7 @@ Author: KarhouTam
 License: MIT
 """
 
-__version__ = '0.1.0'
+__version__ = '1.0.0'
 
 # Core components
 from quanteval.core.strategy import Strategy
