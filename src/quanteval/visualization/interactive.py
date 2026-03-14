@@ -25,7 +25,11 @@ def plot_backtest_results(results):
         shared_xaxes=True,
         vertical_spacing=0.05,
         row_heights=[0.5, 0.25, 0.25],
-        subplot_titles=(f'{results.strategy_name} - 收益曲线（Equity）', '回撤（Drawdown）', '仓位（Position）'),
+        subplot_titles=(
+            f'{results.strategy_name} - 收益曲线（Equity）',
+            '回撤（Drawdown）',
+            '仓位（Position）',
+        ),
     )
 
     # Equity curve

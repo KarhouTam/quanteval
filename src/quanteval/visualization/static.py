@@ -54,7 +54,9 @@ def plot_backtest_results(results, figsize: Tuple[int, int] = (15, 10)):
         )
 
     ax1.set_ylabel('收益曲线 (Equity)', fontsize=16)
-    ax1.set_title(f'{results.strategy_name} - 回测结果（Backtest Result）', fontsize=18, fontweight='bold')
+    ax1.set_title(
+        f'{results.strategy_name} - 回测结果（Backtest Result）', fontsize=18, fontweight='bold'
+    )
     ax1.legend(loc='best')
     ax1.grid(True, alpha=0.3)
 
