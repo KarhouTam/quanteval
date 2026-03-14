@@ -44,10 +44,13 @@ jobs:
         env:
           MPLBACKEND: Agg
         run: |
+          set -euo pipefail
           mkdir -p /tmp/quanteval-notebooks
-          jupyter nbconvert --to notebook --execute --output-dir /tmp/quanteval-notebooks examples/01_quickstart.ipynb
-          jupyter nbconvert --to notebook --execute --output-dir /tmp/quanteval-notebooks examples/02_parameter_optimization.ipynb
-          jupyter nbconvert --to notebook --execute --output-dir /tmp/quanteval-notebooks examples/03_strategy_comparison.ipynb
+          shopt -s nullglob
+          for nb in examples/*.ipynb; do
+            echo "Executing $nb"
+            jupyter nbconvert --to notebook --execute --output-dir /tmp/quanteval-notebooks "$nb"
+          done
 
       - name: Build distribution
         if: matrix.python-version == '3.13'
