@@ -1,9 +1,12 @@
 name: Release
 
+# Trigger when version files are modified or via manual dispatch
 on:
   push:
-    tags:
-      - 'v*'
+    # Only trigger when the two files that declare the package version are changed
+    paths:
+      - 'pyproject.toml'
+      - 'src/quanteval/__init__.py'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -14,14 +17,17 @@ on:
 permissions:
   contents: write
   packages: write
+  # allow creating tags/releases
+  id-token: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,26 +35,60 @@ jobs:
           python-version: '3.13'
           cache: pip
 
+      - name: Check version bump in pyproject.toml and __init__.py
+        id: check
+        env:
+          GITHUB_BEFORE: ${{ github.event.before }}
+          GITHUB_AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          python .github/scripts/check_version_bump.py
+
+      - name: Stop if not a release commit
+        if: ${{ steps.check.outputs.should_release == 'false' }}
+        run: |
+          echo "No version bump detected or versions do not match; skipping release."
+          exit 0
+
+      - name: Create tag for release
+        if: ${{ steps.check.outputs.should_release == 'true' }}
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG=v${VERSION}
+          # avoid error if tag already exists
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists, skipping tag creation."
+          else
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
+
       - name: Install build dependencies
+        if: ${{ steps.check.outputs.should_release == 'true' }}
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
 
       - name: Build release artifacts
+        if: ${{ steps.check.outputs.should_release == 'true' }}
         run: python -m build
 
       - name: Validate artifacts
+        if: ${{ steps.check.outputs.should_release == 'true' }}
         run: twine check dist/*
 
       - name: Publish to TestPyPI (dry-run)
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true' && steps.check.outputs.should_release == 'true' }}
         run: |
           python -m pip install --upgrade pip
           python -m pip install twine
           twine upload --repository-url https://test.pypi.org/legacy/ dist/* -u __token__ -p ${{ secrets.TEST_PYPI_TOKEN }} --skip-existing --verbose
 
       - name: Publish to PyPI
-        if: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true') }}
+        if: ${{ steps.check.outputs.should_release == 'true' && !(github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true') }}
         uses: pypa/gh-action-pypi-publish@v1.5.0
         with:
           skip-existing: true
@@ -57,10 +97,13 @@ jobs:
           password: ${{ secrets.PYPI_TOKEN }}
 
       - name: Create GitHub release
+        if: ${{ steps.check.outputs.should_release == 'true' }}
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
+          tag_name: v${{ steps.check.outputs.version }}
+          name: Release v${{ steps.check.outputs.version }}
           generate_release_notes: true
           files: |
             dist/*
