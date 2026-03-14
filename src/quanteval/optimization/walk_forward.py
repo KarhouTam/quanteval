@@ -67,20 +67,20 @@ class WalkForwardResult:
         """Return a formatted summary of walk-forward results."""
         lines = [
             '=' * 70,
-            '  Walk-Forward Analysis Results',
+            '  滚动前瞻分析结果（Walk-Forward Analysis）',
             '=' * 70,
             '',
-            f'Strategy: {self.strategy_class.__name__}',
-            f'Optimization Metric: {self.metric_name}',
-            f'Number of Windows: {len(self.windows)}',
+            f'策略名称（Strategy）: {self.strategy_class.__name__}',
+            f'优化指标（Optimization Metric）: {self.metric_name}',
+            f'窗口数量（Number of Windows）: {len(self.windows)}',
             '',
-            '📊 Per-Window Performance:',
+            '📊 各窗口表现（Per-Window Performance）:',
             '',
         ]
 
         # Table header
         lines.append(
-            f'{"Window":<8} {"Train Period":<24} {"Test Period":<24} {"Train":<10} {"Test":<10} {"Gap":<10}'
+            f'{"窗口（Window）":<8} {"训练区间（Train Period）":<24} {"测试区间（Test Period）":<24} {"训练得分（Train）":<12} {"测试得分（Test）":<12} {"回撤（Gap）":<10}'
         )
         lines.append('-' * 86)
 
@@ -102,12 +102,10 @@ class WalkForwardResult:
         lines.extend(
             [
                 '-' * 86,
-                f'{"Mean":<8} {"":<24} {"":<24} '
-                f'{float(np.mean(train_scores)):>9.3f} {float(np.mean(test_scores)):>9.3f} {float(np.mean(gaps)):>9.3f}',
-                f'{"Std":<8} {"":<24} {"":<24} '
-                f'{float(np.std(train_scores)):>9.3f} {float(np.std(test_scores)):>9.3f} {float(np.std(gaps)):>9.3f}',
+                f'{"平均值（Mean）":<8} {"":<24} {"":<24} {float(np.mean(train_scores)):>9.3f} {float(np.mean(test_scores)):>9.3f} {float(np.mean(gaps)):>9.3f}',
+                f'{"标准差（Std）":<8} {"":<24} {"":<24} {float(np.std(train_scores)):>9.3f} {float(np.std(test_scores)):>9.3f} {float(np.std(gaps)):>9.3f}',
                 '',
-                '🎯 Combined Out-of-Sample Performance:',
+                '🎯 样本外综合表现（Combined Out-of-Sample Performance）:',
                 '',
             ]
         )
@@ -116,11 +114,11 @@ class WalkForwardResult:
         metrics = self.combined_results.summary()
         lines.extend(
             [
-                f'  Total Return:        {_series_metric(metrics, "total_return", 0.0) * 100:>8.2f}%',
-                f'  Annual Return:       {_series_metric(metrics, "annual_return", 0.0) * 100:>8.2f}%',
-                f'  Sharpe Ratio:        {_series_metric(metrics, "sharpe_ratio", 0.0):>8.3f}',
-                f'  Max Drawdown:        {_series_metric(metrics, "max_drawdown", 0.0) * 100:>8.2f}%',
-                f'  Win Rate:            {_series_metric(metrics, "win_rate") * 100:>8.2f}%',
+                f'  总收益（Total Return）:           {_series_metric(metrics, "total_return", 0.0) * 100:>8.2f}%',
+                f'  年化收益（Annual Return）:         {_series_metric(metrics, "annual_return", 0.0) * 100:>8.2f}%',
+                f'  夏普比率（Sharpe Ratio）:         {_series_metric(metrics, "sharpe_ratio", 0.0):>8.3f}',
+                f'  最大回撤（Max Drawdown）:         {_series_metric(metrics, "max_drawdown", 0.0) * 100:>8.2f}%',
+                f'  胜率（Win Rate）:                 {_series_metric(metrics, "win_rate") * 100:>8.2f}%',
                 '',
             ]
         )
