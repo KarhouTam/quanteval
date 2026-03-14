@@ -25,7 +25,7 @@ def plot_backtest_results(results):
         shared_xaxes=True,
         vertical_spacing=0.05,
         row_heights=[0.5, 0.25, 0.25],
-        subplot_titles=(f'{results.strategy_name} - 权益曲线', '回撤', '仓位'),
+        subplot_titles=(f'{results.strategy_name} - 收益曲线（Equity）', '回撤（Drawdown）', '仓位（Position）'),
     )
 
     # Equity curve
@@ -58,7 +58,7 @@ def plot_backtest_results(results):
         go.Scatter(
             x=drawdown.index,
             y=drawdown.values,
-            name='回撤',
+            name='回撤（Drawdown）',
             fill='tozeroy',
             line=dict(color='red', width=1),
             fillcolor='rgba(255,0,0,0.3)',
@@ -72,7 +72,7 @@ def plot_backtest_results(results):
         go.Scatter(
             x=results.positions.index,
             y=results.positions.values,
-            name='仓位',
+            name='仓位（Position）',
             fill='tozeroy',
             line=dict(color='green', width=1),
             fillcolor='rgba(0,255,0,0.3)',
@@ -82,11 +82,11 @@ def plot_backtest_results(results):
     )
 
     # Update layout
-    fig.update_layout(height=800, hovermode='x unified', showlegend=True)
+    fig.update_layout(height=800, hovermode='x unified', showlegend=True, template='plotly_white')
 
-    fig.update_yaxes(title_text='权益', row=1, col=1)
-    fig.update_yaxes(title_text='回撤', row=2, col=1)
-    fig.update_yaxes(title_text='仓位', row=3, col=1)
-    fig.update_xaxes(title_text='日期', row=3, col=1)
+    fig.update_yaxes(title_text='收益曲线（Equity）', row=1, col=1)
+    fig.update_yaxes(title_text='回撤（Drawdown）', row=2, col=1)
+    fig.update_yaxes(title_text='仓位（Position）', row=3, col=1)
+    fig.update_xaxes(title_text='日期（Date）', row=3, col=1)
 
     return fig

@@ -124,7 +124,7 @@ class StrategyComparison:
         metric_series = cast(pd.Series, self.metrics_df[metric])
         return metric_series.sort_values(axis=0, ascending=ascending)
 
-    def plot_equity_curves(self, figsize: tuple = (14, 8), style: str = 'ggplot') -> Figure:
+    def plot_equity_curves(self, figsize: tuple = (18, 8), style: str = 'ggplot') -> Figure:
         """
         Plot equity curves for all strategies.
 
@@ -151,10 +151,10 @@ class StrategyComparison:
                 list(equity.index), equity.tolist(), label=strategy_name, linewidth=2, alpha=0.8
             )
 
-        ax.set_xlabel('日期', fontsize=12)
-        ax.set_ylabel('权益曲线', fontsize=12)
-        ax.set_title('策略权益曲线对比', fontsize=14, fontweight='bold')
-        ax.legend(loc='best', fontsize=10)
+        ax.set_xlabel('日期', fontsize=16)
+        ax.set_ylabel('收益曲线', fontsize=16)
+        ax.set_title('策略收益曲线对比', fontsize=18, fontweight='bold')
+        ax.legend(loc='best', fontsize=14)
         ax.grid(True, alpha=0.3)
 
         plt.tight_layout()
@@ -199,10 +199,10 @@ class StrategyComparison:
                     ha='center',
                     va='center',
                     color='black',
-                    fontsize=10,
+                    fontsize=14,
                 )
 
-        ax.set_title('策略收益相关性矩阵', fontsize=14, fontweight='bold', pad=20)
+        ax.set_title('策略收益相关性矩阵', fontsize=18, fontweight='bold', pad=20)
 
         # Add colorbar
         cbar = fig.colorbar(im, ax=ax)
@@ -212,7 +212,7 @@ class StrategyComparison:
         return fig
 
     def plot_metrics_comparison(
-        self, metrics: Optional[List[str]] = None, figsize: tuple = (14, 10)
+        self, metrics: Optional[List[str]] = None, figsize: tuple = (18, 10)
     ) -> Figure:
         """
         Plot bar chart comparing multiple metrics across strategies.
@@ -296,7 +296,7 @@ class StrategyComparison:
                     f'{val:.2f}',
                     ha='center',
                     va='bottom',
-                    fontsize=9,
+                    fontsize=13,
                 )
 
         # Hide unused subplots
@@ -333,7 +333,7 @@ class StrategyComparator:
     >>>
     >>> # Load data
     >>> loader = DataLoader()
-    >>> data = loader.load_stock('600519', '20200101', '20231231')
+    >>> data = loader.load_stock('600519', '20200101', '20231631')
     >>>
     >>> # Create strategies
     >>> strategies = [
