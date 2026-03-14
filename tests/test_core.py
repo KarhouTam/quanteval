@@ -44,3 +44,31 @@ def test_transaction_cost_rejects_non_positive_capital() -> None:
     model = TransactionCost()
     with pytest.raises(ValueError):
         model.calculate(pd.Series([0.0, 1.0]), pd.Series([10.0, 10.5]), initial_capital=0.0)
+
+
+def test_hk_transaction_cost_bilateral_stamp_duty() -> None:
+    from quanteval import HKTransactionCost
+
+    positions = pd.Series([0.0, 1.0, 1.0, 0.0], index=pd.date_range('2023-01-01', periods=4))
+    prices = pd.Series([100.0, 100.0, 100.0, 100.0], index=positions.index)
+
+    hk_tc = HKTransactionCost()
+    hk_costs = hk_tc.calculate(positions, prices)
+
+    a_tc = TransactionCost()
+    a_costs = a_tc.calculate(positions, prices)
+
+    # HK applies stamp duty on BUY (index 1, position_diff = +1)
+    assert hk_costs.iloc[1] > 0
+    assert a_costs.iloc[1] > 0
+    assert hk_costs.iloc[1] > a_costs.iloc[1]
+
+    # HK applies stamp duty on SELL too (index 3, position_diff = -1)
+    assert hk_costs.iloc[3] > 0
+    assert a_costs.iloc[3] > 0
+
+    # HK buy cost == HK sell cost (bilateral symmetry)
+    assert abs(hk_costs.iloc[1] - hk_costs.iloc[3]) < 1e-10
+
+    # API symmetry
+    assert hk_tc.total_cost_rate('buy') == hk_tc.total_cost_rate('sell')

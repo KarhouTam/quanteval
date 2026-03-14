@@ -8,6 +8,8 @@ import pandas as pd
 from pathlib import Path
 from typing import Optional
 import warnings
+import re
+import yfinance as yf
 
 
 class DataLoader:
@@ -239,6 +241,153 @@ class DataLoader:
 
         df['Ret'] = df['Close'].pct_change()
         df = df.dropna()
+
+        if self.use_cache:
+            df.to_parquet(cache_file)
+
+        return df
+
+    def load_hk_stock(
+        self, symbol: str, start_date: str, end_date: Optional[str] = None, adjust: str = ''
+    ) -> pd.DataFrame:
+        """
+        Load historical OHLCV data for Hong Kong (HKEX) stocks via AKShare.
+
+        Args:
+            symbol: HKEX stock code, 5-digit zero-padded string (e.g., '00700' for Tencent)
+            start_date: Start date 'YYYYMMDD'
+            end_date: End date 'YYYYMMDD', default today
+            adjust: Price adjustment type: '' no adjustment, 'qfq' forward, 'hfq' backward
+
+        Returns:
+            DataFrame with DatetimeIndex (timezone-naive, named 'Date') and columns:
+            ['Open', 'High', 'Low', 'Close', 'Volume', 'Amount', 'Ret']
+
+        Raises:
+            ValueError: If symbol is not a 5-digit string, adjust is invalid,
+                        data fetch fails, or no data is available.
+        """
+        if not re.match(r'^\d{5}$', symbol):
+            raise ValueError(
+                f"Invalid HK stock symbol '{symbol}': must be a 5-digit zero-padded string (e.g., '00700')"
+            )
+        valid_adjust = ('', 'qfq', 'hfq')
+        if adjust not in valid_adjust:
+            raise ValueError(f"Invalid adjust value '{adjust}': must be one of {valid_adjust}")
+
+        resolved_end_date = end_date or pd.Timestamp.today().strftime('%Y%m%d')
+
+        cache_file = (
+            self.cache_dir / f'hk_{symbol}_{start_date}_{resolved_end_date}_{adjust}.parquet'
+        )
+
+        if self.use_cache and cache_file.exists():
+            return pd.read_parquet(cache_file)
+
+        try:
+            df = ak.stock_hk_hist(
+                symbol=symbol,
+                period='daily',
+                start_date=start_date,
+                end_date=resolved_end_date,
+                adjust=adjust,
+            )
+        except Exception as e:
+            raise ValueError(f'Failed to fetch HK data for {symbol}: {e}') from e
+
+        if df.empty:
+            raise ValueError(
+                f'No data available for HK stock {symbol} from {start_date} to {resolved_end_date}'
+            )
+
+        column_mapping = {
+            '日期': 'Date',
+            '开盘': 'Open',
+            '收盘': 'Close',
+            '最高': 'High',
+            '最低': 'Low',
+            '成交量': 'Volume',
+            '成交额': 'Amount',
+            '振幅': 'Amplitude',
+            '涨跌幅': 'Pct_Chg',
+            '涨跌额': 'Change',
+            '换手率': 'Turnover',
+        }
+        df = df.rename(columns=column_mapping)
+
+        df['Date'] = pd.to_datetime(df['Date'])
+        df = df.set_index('Date')
+
+        essential_cols = ['Open', 'High', 'Low', 'Close', 'Volume', 'Amount']
+        available_cols = [col for col in essential_cols if col in df.columns]
+        df = df[available_cols]
+
+        df['Ret'] = pd.Series(df['Close'], index=df.index, dtype=float).pct_change()
+        df = df.dropna()
+
+        if self.use_cache:
+            df.to_parquet(cache_file)
+
+        return df
+
+    def load_hk_index(
+        self, symbol: str, start_date: str, end_date: Optional[str] = None
+    ) -> pd.DataFrame:
+        """
+        Load historical OHLCV data for Hong Kong market indices via yfinance.
+
+        Supported symbols: '^HSI' (Hang Seng Index), '^HSCE' (Hang Seng China Enterprises).
+        Note: '^HSTECH' is NOT supported due to a known yfinance bug.
+
+        Args:
+            symbol: Index ticker symbol (e.g., '^HSI', '^HSCE')
+            start_date: Start date 'YYYYMMDD'
+            end_date: End date 'YYYYMMDD', default None (fetch up to today)
+
+        Returns:
+            DataFrame with DatetimeIndex (timezone-naive, named 'Date') and columns:
+            ['Open', 'High', 'Low', 'Close', 'Volume', 'Ret']
+
+        Raises:
+            ValueError: If symbol is '^HSTECH', data fetch fails, or no data available.
+        """
+        if symbol == '^HSTECH':
+            raise ValueError(
+                "'^HSTECH' is not supported: yfinance has a known bug with this ticker "
+                "(AttributeError on tzinfo). Use '3033.HK' ETF as a proxy if needed."
+            )
+
+        cache_sym = symbol.replace('^', '_')
+        cache_file = self.cache_dir / f'hk_index_{cache_sym}_{start_date}_{end_date}.parquet'
+
+        if self.use_cache and cache_file.exists():
+            return pd.read_parquet(cache_file)
+
+        start_dt = pd.to_datetime(start_date, format='%Y%m%d')
+        end_dt = pd.to_datetime(end_date, format='%Y%m%d') if end_date else None
+
+        try:
+            ticker = yf.Ticker(symbol)
+            df = ticker.history(start=start_dt, end=end_dt)
+        except Exception as e:
+            raise ValueError(f'Failed to fetch HK index data for {symbol}: {e}') from e
+
+        if df.empty:
+            raise ValueError(f'No data available for HK index {symbol}')
+
+        # Strip timezone from yfinance DatetimeIndex (returns Asia/Hong_Kong tz-aware)
+        df.index = df.index.tz_localize(None)
+        df.index.name = 'Date'
+
+        available_cols = [
+            col for col in ['Open', 'High', 'Low', 'Close', 'Volume'] if col in df.columns
+        ]
+        df = df[available_cols].copy()
+
+        df['Ret'] = df['Close'].pct_change()
+        df = df.dropna()
+
+        df = df.loc[start_dt:]
 
         if self.use_cache:
             df.to_parquet(cache_file)

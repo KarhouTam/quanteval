@@ -16,7 +16,7 @@ from quanteval.core.backtester import (
     MultiBacktestResults,
     MetricsSnapshot,
 )
-from quanteval.core.transaction import TransactionCost
+from quanteval.core.transaction import TransactionCost, HKTransactionCost
 
 # Data management
 from quanteval.data.loader import DataLoader
@@ -64,6 +64,7 @@ __all__ = [
     'MultiBacktestResults',
     'MetricsSnapshot',
     'TransactionCost',
+    'HKTransactionCost',
     # Data
     'DataLoader',
     # Metrics
