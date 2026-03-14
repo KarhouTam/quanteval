@@ -52,17 +52,19 @@ def extract_version_init(text: str) -> str:
 
 
 def write_output(pairs: dict):
-    out_path = os.environ.get("GITHUB_OUTPUT")
-    for k, v in pairs.items():
-        line = f"{k}={v}\n"
-        if out_path:
-            try:
-                with open(out_path, "a") as f:
-                    f.write(line)
-            except Exception:
-                pass
-        # Also print for visibility
-        print(line.strip())
+    # Write key=value pairs to a temp file so the workflow can load them.
+    out_file = os.environ.get("CHECK_OUTPUT_FILE", "/tmp/check_version_output.txt")
+    try:
+        with open(out_file, "a", encoding="utf-8") as f:
+            for k, v in pairs.items():
+                line = f"{k}={v}\n"
+                f.write(line)
+                # also print for logs
+                print(line.strip())
+    except Exception:
+        # fallback to stdout only
+        for k, v in pairs.items():
+            print(f"{k}={v}")
 
 
 def main():

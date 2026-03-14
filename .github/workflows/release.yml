@@ -40,9 +40,17 @@ jobs:
         env:
           GITHUB_BEFORE: ${{ github.event.before }}
           GITHUB_AFTER: ${{ github.sha }}
+          CHECK_OUTPUT_FILE: /tmp/check_version_output.txt
         run: |
           set -euo pipefail
+          # Run the check script which writes key=value pairs to $CHECK_OUTPUT_FILE
           python .github/scripts/check_version_bump.py
+          # Show the file for logs
+          cat "$CHECK_OUTPUT_FILE" || true
+          # Append to GITHUB_OUTPUT so the step outputs are available
+          if [ -n "${GITHUB_OUTPUT-}" ] && [ -f "$CHECK_OUTPUT_FILE" ]; then
+            cat "$CHECK_OUTPUT_FILE" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Stop if not a release commit
         if: ${{ steps.check.outputs.should_release == 'false' }}
