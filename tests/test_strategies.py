@@ -1,6 +1,11 @@
 import pandas as pd
 
-from quanteval import BollingerMeanReversionStrategy, BuyAndHoldStrategy, DualMAStrategy
+from quanteval.strategies import (
+    BollingerMeanReversionStrategy,
+    BuyAndHoldStrategy,
+    DualMAStrategy,
+    DualThrustStrategy,
+)
 
 
 def test_buy_and_hold_always_long(sample_market_data: pd.DataFrame) -> None:
@@ -20,3 +25,9 @@ def test_bollinger_strategy_returns_position_series(sample_market_data: pd.DataF
     )
     assert signal.index.equals(sample_market_data.index)
     assert set(signal.unique()).issubset({0.0, 1.0})
+
+
+def test_dual_thrust_returns_binary_signal(sample_market_data: pd.DataFrame) -> None:
+    signal = DualThrustStrategy(k1=0.5, k2=0.5, window=5).generate_signals(sample_market_data)
+    assert isinstance(signal, pd.Series)
+    assert set(signal.dropna().unique()).issubset({0, 1})
