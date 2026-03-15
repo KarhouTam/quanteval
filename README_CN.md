@@ -2,14 +2,14 @@
 
 ![CI](https://github.com/KarhouTam/quanteval/actions/workflows/ci.yml/badge.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
-[English README](../README.md) · [贡献指南](../CONTRIBUTING.md)
+[English README](README.md) · [贡献指南](CONTRIBUTING.md)
 
 QuantEval 是一个专门为 A 股和港股 (HKEX) 研究量身定制的轻量级、友好型 Python 工具包！无论是策略回测、多策略对比、因子验证，还是参数优化，它都能帮你更高效地完成，让你的量化之旅更加顺滑。🚀
 
 ## ✨ 功能概览
 
 - ⏱️ **专业回测引擎**：支持信号延迟执行，帮你避开恼人的“未来函数”陷阱，让回测更贴近实战！
-- 🤖 **内置经典策略**：双均线 (Dual MA)、均值回归 (Mean Reversion)、布林带回归 (Bollinger Mean Reversion)、以及稳定的买入持有 (Buy & Hold)。
+- 🤖 **内置经典策略**：双均线 (Dual MA)、布林带回归 (Bollinger Mean Reversion)、以及稳定的买入持有 (Buy & Hold) 等。全集指路 👉 [src/quanteval/strategies](src/quanteval/strategies)
 - 🔀 **多策略对比**：支持多策略相关性分析、指标排名以及等权投资组合 (Equal-weight Portfolio) 的构建。
 - 📊 **丰富技术指标**：从 SMA、EMA 到 RSI、MACD、ATR 以及动量指标等一应俱全。
 - 🔍 **优化与分析**：支持网格搜索优化参数，还有 walk-forward 样本外分析让你的策略更经得起考验。
@@ -71,8 +71,8 @@ results.plot()           # 快乐看图
 
 查看这些 Notebooks 快速上手：
 
-- [`examples/01_quickstart.ipynb`](../examples/01_quickstart.ipynb)：新手村第一站，基础数据加载与回测 🏃
-- [`examples/02_parameter_optimization.ipynb`](../examples/02_parameter_optimization.ipynb)：寻找策略“财富密码”，网格搜索与 walk-forward 🎯
-- [`examples/03_strategy_comparison.ipynb`](../examples/03_strategy_comparison.ipynb)：策略大比拼，构建等权组合 ⚔️
-- [`examples/04_hk_market_support.ipynb`](../examples/04_hk_market_support.ipynb)：进军港股市场，双边印花税与恒指数据 🇭🇰
+- [`examples/01_quickstart.ipynb`](examples/01_quickstart.ipynb)：新手村第一站，基础数据加载与回测 🏃
+- [`examples/02_parameter_optimization.ipynb`](examples/02_parameter_optimization.ipynb)：寻找策略“财富密码”，网格搜索与 walk-forward 🎯
+- [`examples/03_strategy_comparison.ipynb`](examples/03_strategy_comparison.ipynb)：策略大比拼，构建等权组合 ⚔️
+- [`examples/04_hk_market_support.ipynb`](examples/04_hk_market_support.ipynb)：进军港股市场，双边印花税与恒指数据 🇭🇰
 - [`TUTORIAL_CN.md`](./TUTORIAL_CN.md): 深度中文图文教程 📚

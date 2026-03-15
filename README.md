@@ -2,14 +2,14 @@
 
 ![CI](https://github.com/KarhouTam/quanteval/actions/workflows/ci.yml/badge.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
-[中文说明 / Chinese Guide](./docs/README_CN.md) · [贡献指南 / Contributing](./CONTRIBUTING.md)
+[中文说明 / Chinese Guide](README_CN.md) · [贡献指南 / Contributing](./CONTRIBUTING.md)
 
 QuantEval is a lightweight, friendly Python toolkit for researching Chinese A-share and Hong Kong (HKEX) strategies, factors, and benchmark comparisons. We've combined a reusable package under `src/quanteval`, tutorial notebooks, and automated workflows to make your quant journey smoother! 🚀
 
 ## ✨ Highlights
 
 - ⏱️ **Backtesting engine** with delayed signal execution to keep things realistic (no look-ahead bias here!).
-- 🤖 **Built-in strategies**: Dual Moving Average, Mean Reversion, Bollinger Mean Reversion, and consistent Buy-and-Hold.
+- 🤖 **Built-in strategies**: Classic strategies like Dual Moving Average, Bollinger Mean Reversion, and consistent Buy-and-Hold... Full set in 👉 [src/quanteval/strategies](src/quanteval/strategies)
 - 🔀 **Strategy Comparison**: Multi-strategy correlation analysis, ranking, and equal-weight portfolio construction.
 - 📊 **Technical factors**: From SMA and RSI to MACD, ATR, and more.
 - 🔍 **Optimization**: Grid-search and walk-forward analysis to fine-tune your ideas.
