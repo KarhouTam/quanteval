@@ -314,7 +314,8 @@ class MultiBacktestResults:
         available_cols = [c for c in cols_map.keys() if c in summary_df.columns]
 
         if available_cols:
-            display_df = cast(pd.DataFrame, summary_df[available_cols].copy())
+            # Ensure we can assign formatted string values into the frame
+            display_df = cast(pd.DataFrame, summary_df[available_cols].copy()).astype(object)
             for c in available_cols:
                 fmt = cols_map[c][1]
                 column = cast(pd.Series, display_df[c])
