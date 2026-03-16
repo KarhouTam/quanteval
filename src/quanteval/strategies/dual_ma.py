@@ -60,7 +60,9 @@ class DualMAStrategy(Strategy):
             fast_ma = data['Close'].rolling(window=fast_window).mean()
             slow_ma = data['Close'].rolling(window=slow_window).mean()
 
-        # Generate signal: 1 if fast > slow, else 0
-        signal = np.where(fast_ma > slow_ma, 1, 0)
+        # Generate signals
+        signal = pd.Series(np.nan, index=data.index, name='Signal')
+        signal[fast_ma > slow_ma] = 1
+        signal[fast_ma <= slow_ma] = 0
 
-        return pd.Series(signal, index=data.index, name='Signal')
+        return signal.ffill().fillna(0)

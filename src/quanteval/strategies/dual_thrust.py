@@ -49,8 +49,7 @@ class DualThrustStrategy(Strategy):
         Returns:
             Series with values:
                 1: Long position (price > upper threshold)
-                -1: Short position (price < lower threshold)
-                0: No position
+                0: No position (price < lower threshold)
         """
         k1 = self.params['k1']
         k2 = self.params['k2']
@@ -61,15 +60,16 @@ class DualThrustStrategy(Strategy):
         hc = data['Close'].shift(1).rolling(window=n).max()
         ll = data['Low'].shift(1).rolling(window=n).min()
         lc = data['Close'].shift(1).rolling(window=n).min()
+
         diff = np.maximum(hh - lc, hc - ll)
 
         # Calculate thresholds
-        upper_threshold = data['Open'] + k1 * diff
-        lower_threshold = data['Open'] - k2 * diff
+        upper = data['Open'] + k1 * diff
+        lower = data['Open'] - k2 * diff
 
         # Generate signals
-        signals = pd.Series(0, index=data.index)
-        signals[data['High'] > upper_threshold] = 1  # Buy signal
-        signals[data['Low'] < lower_threshold] = 0  # Sell signal
+        signal = pd.Series(np.nan, index=data.index, name='Signal')
+        signal[data['Close'] > upper] = 1
+        signal[data['Close'] < lower] = 0
 
-        return signals
+        return signal.ffill().fillna(0)

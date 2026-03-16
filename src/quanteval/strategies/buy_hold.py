@@ -21,6 +21,8 @@ class BuyAndHoldStrategy(Strategy):
         >>> results = bt.run()
     """
 
+    name = 'BuyAndHold'
+
     def __init__(self):
         super().__init__(name='BuyAndHold')
 

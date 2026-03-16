@@ -52,19 +52,10 @@ class BollingerMeanReversionStrategy(Strategy):
         upper = middle + (num_std * std)
         lower = middle - (num_std * std)
 
-        # Initialize signal with NaN
-        signal = pd.Series(np.nan, index=data.index)
-
-        # Entry signal: Price touches lower band (buy signal)
+        # Generate signals
+        signal = pd.Series(np.nan, index=data.index, name='Signal')
         signal[data['Close'] < lower] = 1
-
-        # Exit signal: Price touches upper band (sell signal)
         signal[data['Close'] > upper] = 0
 
-        # Forward fill to maintain position between signals
-        signal = signal.ffill()
+        return signal.ffill().fillna(0)
 
-        # Fill initial NaNs with 0 (no position)
-        signal = signal.fillna(0)
-
-        return signal
