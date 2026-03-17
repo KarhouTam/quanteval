@@ -58,4 +58,3 @@ class BollingerMeanReversionStrategy(Strategy):
         signal[data['Close'] > upper] = 0
 
         return signal.ffill().fillna(0)
-
