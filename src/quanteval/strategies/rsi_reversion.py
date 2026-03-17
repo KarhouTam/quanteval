@@ -6,6 +6,7 @@ Classic mean-reversion strategy using RSI overbought/oversold signals.
 import pandas as pd
 import numpy as np
 from quanteval.core.strategy import Strategy
+from quanteval.factors import RSI
 
 
 class RSIStrategy(Strategy):
@@ -53,24 +54,7 @@ class RSIStrategy(Strategy):
         oversold = self.params['oversold']
         overbought = self.params['overbought']
 
-        close = data['Close']
-
-        # Calculate price change
-        delta = close.diff()
-
-        # Separate gains and losses
-        gain = delta.clip(lower=0)
-        loss = -delta.clip(upper=0)
-
-        # Calculate rolling averages
-        avg_gain = gain.rolling(window=window).mean()
-        avg_loss = loss.rolling(window=window).mean()
-
-        # Calculate RS
-        rs = avg_gain / avg_loss
-
-        # Calculate RSI
-        rsi = 100 - (100 / (1 + rs))
+        rsi = RSI(period=window).calculate(data)
 
         signal = pd.Series(np.nan, index=data.index, name='Signal')
         signal[rsi < oversold] = 1

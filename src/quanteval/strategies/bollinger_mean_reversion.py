@@ -6,6 +6,7 @@ Mean reversion strategy using Bollinger Bands.
 import pandas as pd
 import numpy as np
 from quanteval.core.strategy import Strategy
+from quanteval.factors import BollingerBands
 
 
 class BollingerMeanReversionStrategy(Strategy):
@@ -46,15 +47,11 @@ class BollingerMeanReversionStrategy(Strategy):
         window = self.params['window']
         num_std = self.params['num_std']
 
-        # Calculate Bollinger Bands
-        middle = data['Close'].rolling(window=window).mean()
-        std = data['Close'].rolling(window=window).std()
-        upper = middle + (num_std * std)
-        lower = middle - (num_std * std)
+        bands = BollingerBands(window=window, num_std=num_std).calculate(data)
 
         # Generate signals
         signal = pd.Series(np.nan, index=data.index, name='Signal')
-        signal[data['Close'] < lower] = 1
-        signal[data['Close'] > upper] = 0
+        signal[data['Close'] < bands['lower']] = 1
+        signal[data['Close'] > bands['upper']] = 0
 
         return signal.ffill().fillna(0)

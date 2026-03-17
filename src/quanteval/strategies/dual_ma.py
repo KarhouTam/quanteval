@@ -6,6 +6,7 @@ Classic trend-following strategy using moving average crossovers.
 import pandas as pd
 import numpy as np
 from quanteval.core.strategy import Strategy
+from quanteval.factors import SMA, EMA
 
 
 class DualMAStrategy(Strategy):
@@ -54,11 +55,13 @@ class DualMAStrategy(Strategy):
 
         # Calculate moving averages
         if ma_type == 'ema':
-            fast_ma = data['Close'].ewm(span=fast_window, adjust=False).mean()
-            slow_ma = data['Close'].ewm(span=slow_window, adjust=False).mean()
-        else:  # sma
-            fast_ma = data['Close'].rolling(window=fast_window).mean()
-            slow_ma = data['Close'].rolling(window=slow_window).mean()
+            fast_ma = EMA(span=fast_window).calculate(data)
+            slow_ma = EMA(span=slow_window).calculate(data)
+        elif ma_type == 'sma':  # sma
+            fast_ma = SMA(window=fast_window).calculate(data)
+            slow_ma = SMA(window=slow_window).calculate(data)
+        else:
+            raise ValueError("ma_type must be 'sma' or 'ema'")
 
         # Generate signals
         signal = pd.Series(np.nan, index=data.index, name='Signal')
