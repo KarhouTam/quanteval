@@ -2,14 +2,16 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [master]
+    paths:
+      - "src/quanteval/__init__.py"
+      - "pyproject.toml"
   workflow_dispatch:
     inputs:
       dry_run:
         description: 'If "true", publish to TestPyPI (requires TEST_PYPI_TOKEN).'
         required: false
-        default: 'false'
+        default: "false"
 
 permissions:
   contents: write
@@ -22,11 +24,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check if both version files were changed
+        id: check_versions
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            # Compare with the previous commit to check if both files changed
+            git diff --name-only HEAD~1 | grep -E "src/quanteval/__init__.py|pyproject.toml" > /tmp/changes.txt
+            INIT_CHANGED=$(grep "src/quanteval/__init__.py" /tmp/changes.txt || echo "")
+            PYPROJECT_CHANGED=$(grep "pyproject.toml" /tmp/changes.txt || echo "")
+            
+            if [[ -n "$INIT_CHANGED" && -n "$PYPROJECT_CHANGED" ]]; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "⚠️ Release skipped: Both 'src/quanteval/__init__.py' and 'pyproject.toml' must be modified in the same commit."
+            fi
+          fi
+
+      - name: Cancel if versions were not both changed
+        if: steps.check_versions.outputs.changed == 'false' && github.event_name != 'workflow_dispatch'
+        run: |
+          echo "::error::Release cancelled: Both version files must be updated together"
+          exit 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
           cache: pip
 
       - name: Install build dependencies
@@ -55,12 +84,3 @@ jobs:
           verbose: true
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
-
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          generate_release_notes: true
-          files: |
-            dist/*
