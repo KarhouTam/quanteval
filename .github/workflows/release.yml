@@ -37,7 +37,7 @@ jobs:
             git diff --name-only HEAD~1 | grep -E "src/quanteval/__init__.py|pyproject.toml" > /tmp/changes.txt
             INIT_CHANGED=$(grep "src/quanteval/__init__.py" /tmp/changes.txt || echo "")
             PYPROJECT_CHANGED=$(grep "pyproject.toml" /tmp/changes.txt || echo "")
-            
+
             if [[ -n "$INIT_CHANGED" && -n "$PYPROJECT_CHANGED" ]]; then
               echo "changed=true" >> $GITHUB_OUTPUT
             else
