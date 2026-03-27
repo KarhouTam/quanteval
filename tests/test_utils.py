@@ -2,7 +2,7 @@ import pandas as pd
 
 import pytest
 
-from quanteval import align_series, calculate_cumulative_returns, calculate_returns
+from quanteval.utils import align_series, calculate_cumulative_returns, calculate_returns
 
 
 def test_calculate_returns_and_cumulative_returns() -> None:

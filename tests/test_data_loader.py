@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from quanteval import DataLoader
+from quanteval.data.loader import DataLoader
 
 
 def test_load_stock_uses_cache_when_available(

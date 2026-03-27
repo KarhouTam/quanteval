@@ -16,10 +16,10 @@ from matplotlib.figure import Figure
 
 logger = logging.getLogger(__name__)
 
-from .core.strategy import Strategy
-from .core.backtester import Backtester, BacktestResults
-from .core.transaction import TransactionCost
-from .utils.helpers import configure_chinese_font
+from ..core.strategy import Strategy
+from ..core.backtester import Backtester, BacktestResults
+from ..core.transaction import TransactionCost
+from .helpers import configure_chinese_font
 
 
 @dataclass
@@ -514,7 +514,7 @@ class StrategyComparator:
         benchmark_equity = None if benchmark_returns is None else (1 + benchmark_returns).cumprod()
 
         # Calculate metrics
-        from .metrics.performance import PerformanceMetrics
+        from ..metrics.performance import PerformanceMetrics
 
         perf = PerformanceMetrics(
             strategy_returns=portfolio_returns,

@@ -6,6 +6,7 @@ from quanteval.strategies.donchain_channel import DonchianChannel
 from quanteval.strategies.dual_ma import DualMAStrategy
 from quanteval.strategies.dual_thrust import DualThrustStrategy
 from quanteval.strategies.rsi_reversion import RSIStrategy
+from quanteval.strategies.multi_factor_model import MultiFactorModel
 
 __all__ = [
     'DualMAStrategy',
@@ -14,4 +15,5 @@ __all__ = [
     'DualThrustStrategy',
     'RSIStrategy',
     'DonchianChannel',
+    'MultiFactorModel',
 ]

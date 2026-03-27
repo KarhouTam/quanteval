@@ -1,6 +1,6 @@
 import pandas as pd
 
-from quanteval import (
+from quanteval.factors import (
     ATR,
     BollingerBands,
     MACD,

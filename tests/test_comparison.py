@@ -1,6 +1,7 @@
 import pandas as pd
 
-from quanteval import BollingerMeanReversionStrategy, DualMAStrategy, StrategyComparator
+from quanteval.strategies import BollingerMeanReversionStrategy, DualMAStrategy
+from quanteval.utils.comparison import StrategyComparator
 
 
 def test_strategy_comparison_builds_metrics_table(sample_market_data: pd.DataFrame) -> None:

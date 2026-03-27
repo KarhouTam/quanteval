@@ -1,7 +1,9 @@
 import pandas as pd
 import pytest
 
-from quanteval import Backtester, DualMAStrategy, TransactionCost
+from quanteval.core.backtester import Backtester
+from quanteval.strategies import DualMAStrategy
+from quanteval.core.transaction import TransactionCost
 
 
 def test_backtester_adds_returns_when_missing(sample_market_data: pd.DataFrame) -> None:

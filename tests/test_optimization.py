@@ -1,6 +1,7 @@
 import pandas as pd
 
-from quanteval import DualMAStrategy, GridSearch, WalkForwardAnalysis
+from quanteval.strategies import DualMAStrategy
+from quanteval.optimization import GridSearch, WalkForwardAnalysis
 
 
 def test_grid_search_finds_best_params(sample_market_data: pd.DataFrame) -> None:
