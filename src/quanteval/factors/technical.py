@@ -259,3 +259,37 @@ class StochasticOscillator(Factor):
         d_line = k_line.rolling(window=d_period).mean()
 
         return {'k': k_line, 'd': d_line}
+
+
+class Volatility(Factor):
+    """
+    波动率因子 (Volatility Factor)
+
+    Args:
+        window: 窗口期 (Window size, default 20)
+    """
+
+    def __init__(self, window: int | None = None, decay: float | None = None):
+        assert (window or decay) and not (window and decay), (
+            'Must specify either window or decay, but not both.'
+        )
+        if window:
+            super().__init__(name='RollingVolatility', window=window)
+        else:
+            super().__init__(name='EWMAVolatility', decay=decay)
+
+    def calculate(self, data: pd.DataFrame) -> pd.Series:
+        """Compute Volatility as the rolling standard deviation of returns. Returns a pd.Series of volatility values."""
+        window = self.params['window']
+        decay = self.params['decay']
+
+        if window and window > 0:
+            # Calculate daily returns
+            rolling_vol = data['Close'].pct_change().rolling(window=window).std()
+            return rolling_vol
+        elif decay and 0 < decay < 1:
+            # Calculate daily returns
+            ewma_vol = (
+                data['Close'].pct_change().ewm(span=int(2 / (1 - decay) - 1), adjust=False).std()
+            )
+            return ewma_vol

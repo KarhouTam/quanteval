@@ -12,6 +12,7 @@ from quanteval.factors.technical import (
     SMA,
     StochasticOscillator,
     VolumeMA,
+    Volatility,
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     'VolumeMA',
     'ROC',
     'StochasticOscillator',
+    'Volatility',
 ]
