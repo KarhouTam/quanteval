@@ -38,6 +38,12 @@ from quanteval.factors.technical import (
     ROC,
     StochasticOscillator,
 )
+from quanteval.aggregators import (
+    FactorAggregator,
+    EqualWeightAggregator,
+    ICWeightedAggregator,
+)
+from quanteval.strategies.multi_factor_model import MultiFactorModel
 
 # Benchmark strategies
 from quanteval.strategies.dual_ma import DualMAStrategy
@@ -81,6 +87,14 @@ __all__ = [
     'VolumeMA',
     'ROC',
     'StochasticOscillator',
+    # Factor Aggregators
+    'FactorAggregator',
+    'EqualWeightAggregator',
+    'ICWeightedAggregator',
+    # Factor Models
+    'FactorModel',
+    'CompositeFactorModel',
+    'MomentumValueModel',
     # Strategies
     'DualMAStrategy',
     'BollingerMeanReversionStrategy',
@@ -88,6 +102,7 @@ __all__ = [
     # Optimization
     'GridSearch',
     'WalkForwardAnalysis',
+    'MultiFactorModel',
     # Comparison
     'StrategyComparator',
     'StrategyComparison',
