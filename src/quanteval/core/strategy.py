@@ -42,6 +42,10 @@ class Strategy(ABC):
             - Do NOT shift signals here - the backtester handles this automatically
             - Signals should be based on data available at time t
             - The backtester will apply .shift(1) to avoid look-ahead bias
+            - The backtester's PositionSizer converts these binary signals into
+              fractional position weights [0.0, 1.0] after the look-ahead shift.
+              Backtester 中的 PositionSizer 在应用前瞻偏移后将信号转换为
+              分数仓位权重 [0.0, 1.0]，策略本身仍应返回二值信号 {0, 1}。
         """
         pass
 

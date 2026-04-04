@@ -8,8 +8,15 @@ __version__ = '1.0.0'
 
 # Core
 from quanteval.core.strategy import Strategy
-from quanteval.core.backtester import Backtester, BacktestResults
+from quanteval.core.backtester import Backtester, BacktestResults, MultiBacktestResults
 from quanteval.core.transaction import TransactionCost, HKTransactionCost
+from quanteval.core.sizer import (
+    PositionSizer,
+    AllInSizer,
+    FixedFractionSizer,
+    EqualWeightSizer,
+    VolatilityTargetSizer,
+)
 
 # Data
 from quanteval.data.loader import DataLoader
@@ -32,9 +39,16 @@ __all__ = [
     'Strategy',
     'Backtester',
     'BacktestResults',
+    'MultiBacktestResults',
     # Transaction Costs
     'TransactionCost',
     'HKTransactionCost',
+    # Position Sizers
+    'PositionSizer',
+    'AllInSizer',
+    'FixedFractionSizer',
+    'EqualWeightSizer',
+    'VolatilityTargetSizer',
     # Data
     'DataLoader',
     # Metrics

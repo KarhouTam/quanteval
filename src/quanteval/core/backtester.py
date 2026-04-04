@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from typing import Optional, Dict, Union, List, cast
 from quanteval.core.strategy import Strategy
+from quanteval.core.sizer import AllInSizer, PositionSizer
 from quanteval.strategies.buy_hold import BuyAndHoldStrategy
 from quanteval.core.transaction import TransactionCost
 from quanteval.metrics.performance import PerformanceMetrics
@@ -44,6 +45,19 @@ def _metric_value(summary: pd.Series, key: str, default: float = np.nan) -> floa
         return float(value)
     except (TypeError, ValueError):
         return default
+
+
+def _dedupe_strategy_names(strategies: List[Strategy]) -> Dict[str, Strategy]:
+    deduped: Dict[str, Strategy] = {}
+    seen: Dict[str, int] = {}
+
+    for strategy in strategies:
+        base_name = strategy.name
+        seen[base_name] = seen.get(base_name, 0) + 1
+        name = base_name if seen[base_name] == 1 else f'{base_name}_{seen[base_name]}'
+        deduped[name] = strategy
+
+    return deduped
 
 
 class BacktestResults:
@@ -239,62 +253,241 @@ class MultiBacktestResults:
     """
     多策略回测结果容器
 
-    Container for multiple backtest results.
+    Container for multiple backtest results plus derived comparison analytics.
     """
 
     def __init__(self, results: Dict[str, BacktestResults]):
         self.results = results
+        self.strategy_names = list(results.keys())
+        self.metrics_df = pd.DataFrame(
+            [result.summary().to_dict() for result in results.values()],
+            index=self.strategy_names,
+        )
+        self.returns_df = pd.DataFrame({name: result.returns for name, result in results.items()})
+        self.equity_df = pd.DataFrame(
+            {name: result.equity_curve for name, result in results.items()}
+        )
+        self.correlation_matrix = self.returns_df.corr()
 
     def summary(self) -> pd.DataFrame:
-        """
-        返回所有策略的绩效指标对比矩阵
+        """Return per-strategy metrics with strategies as rows."""
+        return self.metrics_df
 
-        Return performance metrics comparison matrix for all strategies.
-        """
-        summaries = {}
-        for name, res in self.results.items():
-            summaries[name] = res.summary()
-        return pd.DataFrame(summaries)
+    def get_rankings(self, metric: str = 'sharpe_ratio', ascending: bool = False) -> pd.Series:
+        """Rank strategies by a specific metric."""
+        metric_series = cast(pd.Series, self.metrics_df[metric])
+        return metric_series.sort_values(axis=0, ascending=ascending)
 
-    def plot(self, figsize=(15, 10), interactive=False):
-        """
-        绘制所有策略的净值曲线对比
-
-        Plot equity curves comparison for all strategies.
-        """
+    def plot_equity_curves(self, figsize: tuple = (18, 8), style: str = 'ggplot'):
+        """Plot equity curves comparison for all strategies."""
+        from quanteval.utils.helpers import configure_chinese_font
         import matplotlib.pyplot as plt
 
-        plt.figure(figsize=figsize)
-        benchmark_plotted = False
+        configure_chinese_font()
+        plt.style.use(style)
 
-        for name, res in self.results.items():
-            plt.plot(res.equity_curve.index, res.equity_curve, label=name)
+        fig, ax = plt.subplots(figsize=figsize)
+        for strategy_name in self.strategy_names:
+            equity = cast(pd.Series, self.equity_df[strategy_name])
+            ax.plot(
+                list(equity.index), equity.tolist(), label=strategy_name, linewidth=2, alpha=0.8
+            )
 
-            if not benchmark_plotted and res.benchmark_equity is not None:
-                plt.plot(
-                    res.equity_curve.index,
-                    res.benchmark_equity,
-                    label='Benchmark',
-                    color='gray',
-                    linestyle='--',
-                    alpha=0.7,
-                )
-                benchmark_plotted = True
+        benchmark = next(
+            (
+                result.benchmark_equity
+                for result in self.results.values()
+                if result.benchmark_equity is not None
+            ),
+            None,
+        )
+        if benchmark is not None:
+            benchmark_series = cast(pd.Series, benchmark)
+            ax.plot(
+                list(benchmark_series.index),
+                benchmark_series.tolist(),
+                label='Benchmark',
+                color='gray',
+                linestyle='--',
+                alpha=0.7,
+            )
 
-        plt.title('Multi-Strategy Equity Curves Comparison')
-        plt.xlabel('Date')
-        plt.ylabel('Equity (Normalized to 1.0)')
-        plt.legend()
-        plt.grid(True)
+        ax.set_xlabel('日期', fontsize=16)
+        ax.set_ylabel('收益曲线', fontsize=16)
+        ax.set_title('策略收益曲线对比', fontsize=18, fontweight='bold')
+        ax.legend(loc='best', fontsize=14)
+        ax.grid(True, alpha=0.3)
         plt.tight_layout()
-        plt.show()
+        return fig
+
+    def plot_correlation_heatmap(self, figsize: tuple = (10, 8)):
+        """Plot a correlation heatmap of strategy returns."""
+        from quanteval.utils.helpers import configure_chinese_font
+        import matplotlib.pyplot as plt
+
+        configure_chinese_font()
+
+        fig, ax = plt.subplots(figsize=figsize)
+        im = ax.imshow(self.correlation_matrix, cmap='RdYlGn', aspect='auto', vmin=-1, vmax=1)
+
+        ax.set_xticks(np.arange(len(self.strategy_names)))
+        ax.set_yticks(np.arange(len(self.strategy_names)))
+        ax.set_xticklabels(self.strategy_names)
+        ax.set_yticklabels(self.strategy_names)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', rotation_mode='anchor')
+
+        for i in range(len(self.strategy_names)):
+            for j in range(len(self.strategy_names)):
+                ax.text(
+                    j,
+                    i,
+                    f'{self.correlation_matrix.iloc[i, j]:.2f}',
+                    ha='center',
+                    va='center',
+                    color='black',
+                    fontsize=14,
+                )
+
+        ax.set_title('策略收益相关性矩阵', fontsize=18, fontweight='bold', pad=20)
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label('相关系数', rotation=270, labelpad=20)
+        plt.tight_layout()
+        return fig
+
+    def plot_metrics_comparison(
+        self, metrics: Optional[List[str]] = None, figsize: tuple = (18, 10)
+    ):
+        """Plot bar charts comparing selected metrics across strategies."""
+        from quanteval.utils.helpers import configure_chinese_font
+        import matplotlib.pyplot as plt
+
+        if metrics is None:
+            metrics = [
+                'total_return',
+                'annual_return',
+                'sharpe_ratio',
+                'sortino_ratio',
+                'max_drawdown',
+                'win_rate',
+            ]
+
+        configure_chinese_font()
+        plt.style.use('ggplot')
+
+        n_metrics = len(metrics)
+        n_cols = 2
+        n_rows = (n_metrics + 1) // 2
+
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=figsize)
+        axes = np.atleast_1d(axes).flatten()
+
+        metric_labels = {
+            'total_return': '总收益率 (%)',
+            'annual_return': '年化收益率 (%)',
+            'sharpe_ratio': '夏普比率',
+            'sortino_ratio': '索提诺比率',
+            'calmar_ratio': '卡玛比率',
+            'max_drawdown': '最大回撤 (%)',
+            'win_rate': '胜率 (%)',
+            'profit_loss_ratio': '盈亏比',
+        }
+
+        for idx, metric in enumerate(metrics):
+            if metric not in self.metrics_df.columns:
+                continue
+
+            ax = axes[idx]
+            values = cast(pd.Series, self.metrics_df[metric]).copy()
+            if metric in ['total_return', 'annual_return', 'max_drawdown', 'win_rate']:
+                values = values * 100
+
+            bars = ax.bar(self.strategy_names, values, alpha=0.7)
+            for bar, value in zip(bars, values):
+                if metric == 'max_drawdown':
+                    color = 'red' if value < 0 else 'green'
+                else:
+                    color = 'green' if value > 0 else 'red'
+                bar.set_color(color)
+                bar.set_alpha(0.7)
+
+            ax.set_ylabel(metric_labels.get(metric, metric))
+            ax.set_title(metric_labels.get(metric, metric), fontweight='bold')
+            ax.tick_params(axis='x', rotation=45)
+            ax.grid(True, alpha=0.3, axis='y')
+
+            for bar, value in zip(bars, values):
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2.0,
+                    bar.get_height(),
+                    f'{value:.2f}',
+                    ha='center',
+                    va='bottom',
+                    fontsize=13,
+                )
+
+        for idx in range(len(metrics), len(axes)):
+            axes[idx].set_visible(False)
+
+        fig.suptitle('策略指标对比', fontsize=16, fontweight='bold', y=0.995)
+        plt.tight_layout()
+        return fig
+
+    def create_equal_weight_portfolio(self) -> BacktestResults:
+        """Create an equal-weight portfolio from already-computed strategy results."""
+        if not self.results:
+            raise ValueError('Cannot build a portfolio from empty multi-strategy results')
+
+        first_result = next(iter(self.results.values()))
+        portfolio_returns = self.returns_df.mean(axis=1)
+
+        positions_df = pd.DataFrame(
+            {name: result.positions for name, result in self.results.items()}
+        )
+        portfolio_positions = positions_df.mean(axis=1)
+        portfolio_equity = cast(pd.Series, (1.0 + portfolio_returns).cumprod())
+
+        benchmark_returns = None
+        benchmark_equity = None
+        if first_result.benchmark_returns is not None:
+            benchmark_returns = first_result.benchmark_returns.reindex(portfolio_returns.index)
+        if first_result.benchmark_equity is not None:
+            benchmark_equity = first_result.benchmark_equity.reindex(portfolio_returns.index)
+
+        perf = PerformanceMetrics(
+            strategy_returns=portfolio_returns,
+            benchmark_returns=benchmark_returns,
+            positions=portfolio_positions,
+        )
+        metrics = perf.calculate_all()
+        for metric_name in (
+            'num_trades',
+            'win_rate',
+            'profit_loss_ratio',
+            'avg_trade_duration',
+        ):
+            metrics[metric_name] = np.nan
+
+        return BacktestResults(
+            strategy_name='Portfolio',
+            data=first_result.data.loc[portfolio_returns.index],
+            positions=portfolio_positions,
+            signals=pd.Series(0.0, index=portfolio_positions.index),
+            returns=portfolio_returns,
+            equity_curve=portfolio_equity,
+            benchmark_returns=benchmark_returns,
+            benchmark_equity=benchmark_equity,
+            metrics=metrics,
+        )
+
+    def plot(self, figsize=(15, 10), interactive=False):
+        """Plot multi-strategy equity curves."""
+        return self.plot_equity_curves(figsize=figsize)
 
     def __repr__(self) -> str:
         if not self.results:
             return 'MultiBacktestResults(empty)'
 
-        summary_df = self.summary().T
-
+        summary_df = self.summary()
         try:
             from tabulate import tabulate
         except ImportError:
@@ -311,43 +504,28 @@ class MultiBacktestResults:
             'win_rate': ('Win Rate', '.2%'),
         }
 
-        available_cols = [c for c in cols_map.keys() if c in summary_df.columns]
+        available_cols = [c for c in cols_map if c in summary_df.columns]
+        display_df = summary_df[available_cols].copy().astype(object)
+        for column_name in available_cols:
+            label, fmt = cols_map[column_name]
+            display_df.loc[:, column_name] = display_df[column_name].map(
+                lambda value: format(value, fmt) if pd.notnull(value) else 'NaN'
+            )
+            display_df = display_df.rename(columns={column_name: label})
 
-        if available_cols:
-            # Ensure we can assign formatted string values into the frame
-            display_df = cast(pd.DataFrame, summary_df[available_cols].copy()).astype(object)
-            for c in available_cols:
-                fmt = cols_map[c][1]
-                column = cast(pd.Series, display_df[c])
-                display_df.loc[:, c] = column.map(
-                    lambda x: format(x, fmt) if pd.notnull(x) else 'NaN'
-                )
+        if tabulate:
+            separator = '=' * 90
+            table = tabulate(display_df, headers='keys', tablefmt='pretty', showindex=True)
+            return (
+                f'\n{separator}\n'
+                f'  Multi-Strategy Backtest Results (Strategies: {len(self.results)})\n'
+                f'{separator}\n\n{table}\n\n{separator}\n'
+            )
 
-            renamed_columns = {c: cols_map[c][0] for c in available_cols}
-            display_df.columns = [
-                renamed_columns.get(str(column), str(column)) for column in display_df.columns
-            ]
-
-            if tabulate:
-                table_str = tabulate(display_df, headers='keys', tablefmt='pretty', showindex=True)
-                output = [
-                    f'\n{"=" * 90}',
-                    f'  Multi-Strategy Backtest Results (Strategies: {len(self.results)})',
-                    f'{"=" * 90}\n',
-                    table_str,
-                    f'\n{"=" * 90}\n',
-                ]
-                return '\n'.join(output)
-            else:
-                output = [
-                    f'MultiBacktestResults (Strategies: {len(self.results)})',
-                    '=' * 80,
-                    str(display_df),
-                    '=' * 80,
-                ]
-                return '\n'.join(output)
-
-        return f'MultiBacktestResults(strategies={list(self.results.keys())})\n\n{str(summary_df)}'
+        return (
+            f'MultiBacktestResults (Strategies: {len(self.results)})\n'
+            f'{"=" * 80}\n{display_df}\n{"=" * 80}'
+        )
 
 
 class Backtester:
@@ -362,6 +540,10 @@ class Backtester:
         benchmark_strategy: Optional Strategy for benchmark (defaults to BuyAndHoldStrategy)
         transaction_costs: TransactionCost instance or bool
         initial_capital: Initial capital in CNY
+        sizer: Optional PositionSizer to scale positions. Defaults to AllInSizer
+               (all-in / all-out, identical to the pre-sizing behaviour).
+               可选的仓位计算器，用于将信号转换为分数仓位。默认为 AllInSizer
+               （全仓进出，与引入仓位计算功能前的行为完全一致）。
     """
 
     def __init__(
@@ -371,6 +553,7 @@ class Backtester:
         benchmark_strategy: Optional[Strategy] = None,
         transaction_costs: Union[bool, TransactionCost] = True,
         initial_capital: float = 100000.0,
+        sizer: Optional[PositionSizer] = None,
         **kwargs,
     ):
         legacy_benchmark = kwargs.get('benchmark')
@@ -392,10 +575,10 @@ class Backtester:
             self.strategies = {strategy.name: strategy}
             self._single = True
         elif isinstance(strategy, list):
-            self.strategies = {s.name: s for s in strategy}
+            self.strategies = _dedupe_strategy_names(strategy)
             self._single = False
         elif isinstance(strategy, dict):
-            self.strategies = strategy
+            self.strategies = dict(strategy)
             self._single = False
         else:
             raise ValueError(
@@ -412,6 +595,8 @@ class Backtester:
             self.benchmark_strategy = benchmark_strategy
 
         self.initial_capital = initial_capital
+
+        self.sizer: PositionSizer = sizer if sizer is not None else AllInSizer()
 
         # Initialize transaction cost model
         if isinstance(transaction_costs, TransactionCost):
@@ -449,7 +634,7 @@ class Backtester:
         if not isinstance(signals, pd.Series):
             signals = pd.Series(signals, index=self.data.index)
 
-        positions = cast(pd.Series, signals.shift(1).fillna(0.0))
+        positions = self.sizer.apply(cast(pd.Series, signals.shift(1).fillna(0.0)), self.data)
         ret_series = cast(pd.Series, self.data['Ret'])
         close_series = cast(pd.Series, self.data['Close'])
         strategy_returns_gross = positions * ret_series
@@ -530,7 +715,9 @@ class Backtester:
 
         results = {}
         for name, strategy in self.strategies.items():
-            results[name] = self._run_single(strategy)
+            result = self._run_single(strategy)
+            result.strategy_name = name
+            results[name] = result
 
         if self._single:
             return list(results.values())[0]

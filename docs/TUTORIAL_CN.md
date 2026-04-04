@@ -24,7 +24,8 @@ data = loader.load_stock('600519', '20200101', '20231231')
 ### 2.2 运行回测
 
 ```python
-from quanteval import Backtester, DualMAStrategy
+from quanteval import Backtester
+from quanteval.strategies import DualMAStrategy
 
 strategy = DualMAStrategy(fast_window=10, slow_window=60)
 results = Backtester(strategy=strategy, data=data, transaction_costs=True).run()
@@ -34,15 +35,17 @@ print(results.summary())
 ### 2.3 策略对比
 
 ```python
-from quanteval import BollingerMeanReversionStrategy, StrategyComparator
+from quanteval import Backtester
+from quanteval.strategies import BollingerMeanReversionStrategy, DualMAStrategy
 
-comparison = StrategyComparator(
-    strategies=[
-        DualMAStrategy(5, 20),
-        BollingerMeanReversionStrategy(window=20, num_std=2.0),
-    ],
-    verbose=False,
-).compare(data)
+comparison = Backtester(
+    strategy={
+        'DualMA(5,20)': DualMAStrategy(5, 20),
+        'BollingerMR': BollingerMeanReversionStrategy(window=20, num_std=2.0),
+    },
+    data=data,
+    transaction_costs=False,
+).run()
 
 print(comparison.metrics_df)
 ```
@@ -50,7 +53,8 @@ print(comparison.metrics_df)
 ### 2.4 参数优化
 
 ```python
-from quanteval import GridSearch
+from quanteval.optimization import GridSearch
+from quanteval.strategies import DualMAStrategy
 
 search = GridSearch(
     DualMAStrategy,
@@ -69,7 +73,8 @@ print(result.best_params)
 ### 2.5 Walk-forward 样本外验证
 
 ```python
-from quanteval import WalkForwardAnalysis
+from quanteval.optimization import WalkForwardAnalysis
+from quanteval.strategies import DualMAStrategy
 
 wfa = WalkForwardAnalysis(
     DualMAStrategy,
