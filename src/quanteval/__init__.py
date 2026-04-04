@@ -4,7 +4,7 @@ Expose a minimal, stable API for most users. Keep surface area small to
 avoid importing heavy internals on package import.
 """
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 # Core
 from quanteval.core.strategy import Strategy
